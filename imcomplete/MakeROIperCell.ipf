@@ -54,7 +54,7 @@ End
 
 
 
-Function CellMean(Fitimage)
+Function Cellaverage(Fitimage)
 	wave Fitimage;
 	wave ROIperCell;
 	variable i,j,k;
@@ -62,7 +62,8 @@ Function CellMean(Fitimage)
 	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Points
 	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Average
 	Cell_Sum=0;Cell_Points=0;Cell_Average=0;
-
+	
+	Silent 1; PauseUpdate
 	for(k=1;k<dimsize(ROIperCell,2);k+=1)
 		for(i=0;i<dimsize(ROIperCell,0);i+=1)
 			for(j=0;j<dimsize(ROIperCell,1);j+=1)
@@ -80,6 +81,51 @@ Function CellMean(Fitimage)
 	display;appendboxplot Cell_Average vs labelW
 end
 
+
+
+Function CellaverageWV()
+	wave imchi3_data, re_ramanshift2, ROIperCell;
+	variable i,j,k,cts; 
+	make/o/n=(dimsize(imchi3_data, 0)) Allaverage_wv
+	make/o/n=(dimsize(imchi3_data, 0)) AllCellaverage_wv
+	make/o/n=(dimsize(imchi3_data, 0), dimsize(ROIperCell,2)-1) Cellaverage_wv
+	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Points
+	Allaverage_wv=0; AllCellaverage_wv=0; Cellaverage_wv=0; Cell_Points=0;
+
+	Silent 1; PauseUpdate
+	for(i=0;i<dimsize(imchi3_data,1);i+=1)
+		for(j=0;j<dimsize(imchi3_data,2);j+=1)
+			Allaverage_wv[]+=imchi3_data[p][i][j][0]
+		endfor
+	endfor
+	Allaverage_wv/=(dimsize(imchi3_data,1)*dimsize(imchi3_data,2))
+	display/k=1 Allaverage_wv vs re_ramanshift2
+	SetAxis/A/R bottom
+
+	cts=0;
+	for(i=0;i<dimsize(ROIperCell,0);i+=1)
+		for(j=0;j<dimsize(ROIperCell,1);j+=1)
+			if(ROIperCell[i][j][0]==0)
+			AllCellaverage_wv[]+=imchi3_data[p][i][j][0]
+			cts+=1
+			endif
+		endfor
+	endfor
+	AllCellaverage_wv[]/=cts
+
+	for(k=1;k<dimsize(ROIperCell,2);k+=1)
+		for(i=0;i<dimsize(ROIperCell,0);i+=1)
+			for(j=0;j<dimsize(ROIperCell,1);j+=1)
+				if(ROIperCell[i][j][k]==0)
+				Cellaverage_wv[][k-1]+=imchi3_data[p][i][j][0]
+				Cell_Points[k-1]+=1
+				endif
+			endfor
+		endfor
+		Cellaverage_wv[][k-1]/=Cell_Points[k-1]
+		AppendToGraph Cellaverage_wv[][k-1] vs re_ramanshift2
+	endfor
+end
 
 
 
