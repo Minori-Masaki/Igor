@@ -52,31 +52,41 @@ Function ButtonProc_addROI(ba) : ButtonControl
 	return 0
 End	
 
+
+
 Function CellMean(Fitimage)
 	wave Fitimage;
 	wave ROIperCell;
 	variable i,j,k;
-	make/o/n=(dimsize(ROIperCell,2),3) temp00_mean
-	temp00_mean=0
+	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Sum
+	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Points
+	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Average
+	Cell_Sum=0;Cell_Points=0;Cell_Average=0;
 
-	k=0
+	k=1
 	do
 		i=0
 		do
 			j=0
 			do
 				if(ROIperCell[i][j][k]==0)
-				temp00_mean[k][0]+=Fitimage[i][j]
-				temp00_mean[k][1]+=1
+				Cell_Sum[k-1]+=Fitimage[i][j]
+				Cell_Points[k-1]+=1
 				endif
 				j+=1
 			while(j<dimsize(ROIperCell,1))
 			i+=1
 		while(i<dimsize(ROIperCell,0))
-		temp00_mean[k][2]=temp00_mean[k][0]/temp00_mean[k][1]
+		Cell_Average[k-1]=Cell_Sum[k-1]/Cell_Points[k-1]
 		k+=1
 	while(k<dimsize(ROIperCell,2))
+
+	Edit Cell_Sum,Cell_Points,Cell_Average;
+	Make/o/n=3/T labelW={"exp 1","exp 2","exp 3"}
+	display;appendboxplot Cell_Average vs labelW
 end
+
+
 
 
 Function CheckROIPerCell()
