@@ -63,23 +63,17 @@ Function CellMean(Fitimage)
 	make/o/n=(dimsize(ROIperCell,2)-1) Cell_Average
 	Cell_Sum=0;Cell_Points=0;Cell_Average=0;
 
-	k=1
-	do
-		i=0
-		do
-			j=0
-			do
+	for(k=1;k<dimsize(ROIperCell,2);k+=1)
+		for(i=0;i<dimsize(ROIperCell,0);i+=1)
+			for(j=0;j<dimsize(ROIperCell,1);j+=1)
 				if(ROIperCell[i][j][k]==0)
 				Cell_Sum[k-1]+=Fitimage[i][j]
 				Cell_Points[k-1]+=1
 				endif
-				j+=1
-			while(j<dimsize(ROIperCell,1))
-			i+=1
-		while(i<dimsize(ROIperCell,0))
+			endfor
+		endfor
 		Cell_Average[k-1]=Cell_Sum[k-1]/Cell_Points[k-1]
-		k+=1
-	while(k<dimsize(ROIperCell,2))
+	endfor
 
 	Edit Cell_Sum,Cell_Points,Cell_Average;
 	Make/o/n=3/T labelW={"exp 1","exp 2","exp 3"}

@@ -94,7 +94,7 @@ end
 function Positioning(BiggerImage,SmallerImage,xTravel,yTravel)
   wave BiggerImage,SmallerImage; //BiggerImage assumes TIFF original image, SmallerImage assumes mCARS image
   variable xTravel,yTravel;
-  wave EdgeImage, ObjectROI;
+  wave EdgeImage, ObjectROI,ParticleROI;
   variable i,j,bxNum,byNum,sxNum,syNum;
 
   sxNum = dimsize(SmallerImage,0)
@@ -107,12 +107,16 @@ function Positioning(BiggerImage,SmallerImage,xTravel,yTravel)
   duplicate/O ObjectROI, CutObjectROI //To make CutObjectROI for mCARS image
   redimension/N=(sxNum,syNum) CutObjectROI
   CutObjectROI=0
+  duplicate/O ParticleROI, CutObjectROI1
+  redimension/N=(sxNum,syNum) CutObjectROI1
+  CutObjectROI1=0
 
   Silent 1; PauseUpdate
   for(i=0;(i<sxNum && i+xTravel<bxNum);i+=1)
     for(j=0;(j<syNum && j+yTravel<byNum);j+=1)
         PositionImage[i+xTravel][j+yTravel] = SmallerImage[i][j]
         CutObjectROI[i][j]=ObjectROI[i+xTravel][j+yTravel]
+        CutObjectROI1[i][j]=ParticleROI[i+xTravel][j+yTravel]
     endfor
   endfor
   killwindow/z PositionImage0
